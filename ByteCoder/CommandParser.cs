@@ -2,24 +2,16 @@
 using System.Collections.Generic;
 
 namespace ByteCoder
-{
-    public enum MethodType
-    {
-        Find,
-        Checksum
-    }
-
+{   
     public class CommandParser
     {
-        private readonly Dictionary<string, Func< bool>> argumentReaders;
+        private readonly Dictionary<string, Func<bool>> argumentReaders;
         private string[] arguments;
         private int currentIndex;
+        private Command command;
 
         public string Error { get; private set; }
-        public string FilePath { get; private set; }
-        public MethodType? Method { get; private set; }
-        public string KeyString { get; private set; }
-        public bool ShowHelp { get; private set; }
+       
 
         public CommandParser()
         {
@@ -27,19 +19,22 @@ namespace ByteCoder
             {
                 {"-f", parseFileName},
                 {"-m", parseMethodName},
-                {"-s", setKeyString},
+                {"-s", parseKeyString},
                 {"-h", setHelpState},
             };
         }
 
 
-        public bool Parse(string[] args)
+        public Command Parse(string[] args)
         {
             arguments = args;
+            Error = string.Empty;
+            command = new Command();
+
             if (arguments.Length == 0)
             {
                 Error = "Command expected";
-                return false;
+                return null;
             }
 
             for (currentIndex = 0; currentIndex < arguments.Length; currentIndex++)
@@ -48,27 +43,33 @@ namespace ByteCoder
                 if (!argumentReaders.TryGetValue(arguments[currentIndex].ToLowerInvariant(), out readerFunc))
                 {
                     Error = string.Format("Unknown command: {0}.", arguments[currentIndex]);
-                    return false;
+                    return null;
                 }
 
                 currentIndex++;
                 if (!readerFunc())
-                    return false;
+                    return null;
             }
 
-            if (!ShowHelp && !Method.HasValue)
+            if (!command.ShowHelp && !command.Method.HasValue)
             {
                 Error = "Method expected";
-                return false;
+                return null;
             }
 
-            if (Method == MethodType.Find && string.IsNullOrEmpty(KeyString))
+            if (!command.ShowHelp && string.IsNullOrEmpty(command.FilePath))
+            {
+                Error = "File path expected.";
+                return null;
+            }
+
+            if (command.Method == MethodType.Find && string.IsNullOrEmpty(command.KeyString))
             {
                 Error = "Searching string expected";
-                return false;
+                return null;
             }
 
-            return true;
+            return command;
         }
 
         private bool parseFileName()
@@ -79,7 +80,7 @@ namespace ByteCoder
                 return false;
             }
 
-            FilePath = arguments[currentIndex];
+            command.FilePath = arguments[currentIndex];
             return true;
         }
 
@@ -98,11 +99,11 @@ namespace ByteCoder
                 Error = string.Format("Unknown method name {0}.", methodName);
                 return false;
             }
-            Method = method;
+            command.Method = method;
             return true;
         }
 
-        private bool setKeyString()
+        private bool parseKeyString()
         {
             if (arguments.Length <= currentIndex)
             {
@@ -110,13 +111,13 @@ namespace ByteCoder
                 return false;
             }
 
-            KeyString = arguments[currentIndex];
+            command.KeyString = arguments[currentIndex];
             return true;
         }
 
         private bool setHelpState()
         {
-            ShowHelp = true;
+            command.ShowHelp = true;
             return true;
         }
     }

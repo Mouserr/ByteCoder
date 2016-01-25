@@ -6,20 +6,29 @@ namespace ByteCoder
     {
         static void Main(string[] args)
         {
-            CommandParser command = new CommandParser();
+            CommandParser commandParser = new CommandParser();
 
-            if (!command.Parse(args))
+            Command command = commandParser.Parse(args);
+            if (command == null)
             {
-                Console.WriteLine("Error! Wrong input: {0}", command.Error);
+                Console.WriteLine("Error! Wrong input: {0}", commandParser.Error);
                 Console.WriteLine("Use with '-h' for syntax help.");
+                return;
+            }
+            
+            CommandHandler handler = new CommandHandler();
+            
+            if (!handler.Process(command))
+            {
+                Console.WriteLine("Error! {0}", handler.Error);
             }
             else
             {
-                Console.WriteLine("command.FilePath: " + command.FilePath);
-                Console.WriteLine("command.KeyString: " + command.KeyString);
-                Console.WriteLine("command.MethodType: " + command.Method);
-                Console.WriteLine("command.ShowHelp: " + command.ShowHelp);
+                Console.WriteLine(handler.Result);
             }
+
+            Console.Write("Press any key to continue...");
+            Console.ReadKey(true);
         }
     }
 }
