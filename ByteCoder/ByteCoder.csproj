@@ -45,6 +45,7 @@
     <Compile Include="Command.cs" />
     <Compile Include="CommandHandler.cs" />
     <Compile Include="CommandParser.cs" />
+    <Compile Include="FileByteReader.cs" />
     <Compile Include="MethodType.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
