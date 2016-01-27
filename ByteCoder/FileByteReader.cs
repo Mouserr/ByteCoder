@@ -7,14 +7,16 @@ namespace ByteCoder
 {
     public class FileByteReader : IDisposable
     {
-        private const int BufferSize = 4096 * 4096;
+        private const int MaxBufferSize = 4096 * 4096;
         private const int SizeOfWord = sizeof(UInt32);
 
+        private readonly int bufferSize;
         private readonly Stream stream;
 
         public FileByteReader(string filePath)
         {
             stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+            bufferSize = (int) Math.Max(Math.Min((stream.Length/4) * 4, MaxBufferSize), 4);
         }
 
         public void Dispose()
@@ -32,7 +34,7 @@ namespace ByteCoder
             BigInteger checksum = 0;
             using (BinaryReader reader = new BinaryReader(stream))
             {
-                byte[] buffer = new byte[BufferSize];
+                byte[] buffer = new byte[bufferSize];
                 while (reader.BaseStream.Position != reader.BaseStream.Length)
                 {
                     int length = reader.Read(buffer, 0, buffer.Length);
@@ -70,7 +72,7 @@ namespace ByteCoder
             List<long> occurrences = new List<long>();
             using (StreamReader reader = new StreamReader(stream))
             {
-                char[] buffer = new char[BufferSize];
+                char[] buffer = new char[bufferSize];
                 while (reader.BaseStream.Position != reader.BaseStream.Length)
                 {
                     int readedLength = reader.ReadBlock(buffer, 0, buffer.Length);

@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Numerics;
 using System.Text;
-using System.Text.RegularExpressions;
 using ByteCoder;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Numerics;
 using System.Text;
 
 namespace ByteCoder
@@ -58,9 +57,16 @@ namespace ByteCoder
 
         private void showHelp()
         {
-            resultBuilder.AppendLine("Usage: -f <file> -m find -s <search string>");
-            resultBuilder.AppendLine("   or: -f <file> -m checksum");
-            resultBuilder.AppendLine("   or: -h");
+            resultBuilder.Append(
+@"
+Usage: [-f <file> -m <method>] [-s <search string>] [-h]
+where:
+    <method>            Name of requesting method: find or checksum
+    find                Find all occurences of the <search string> in <file> and display their positions
+    checksum            Calculate checksum for <file>
+    <file>              File path
+    <search string>     Key string to find
+    -h                  Show this help message");
         }
 
         private void findString(FileByteReader reader, Command command)
